@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class DayNightScript : MonoBehaviour
 {
-    private float dayDuration = 100.0f;
+    private float dayDuration = 1000.0f;
     private float rotateAngle;
     private float dayHour;
     private float dayPhase;
@@ -27,6 +27,7 @@ public class DayNightScript : MonoBehaviour
         {
             dayHour -= 24;
         }
+        GameState.gameTime24 = dayHour;
         DayPhase dayPhase = PhaseFromHour(dayHour);
         // Debug.Log(dayHour + " " + dayPhase);
 

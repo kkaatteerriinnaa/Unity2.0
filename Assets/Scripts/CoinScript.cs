@@ -18,10 +18,11 @@ public class CoinScript : MonoBehaviour
 
     public void OnDisappearClipEnd()
     {
-        GameEventController.EmitEvent("Disappear", "Coin");
+        GameEventController.EmitEvent("CoinDisappear", this.gameObject);
         Destroy(this.gameObject);
+        GameEventController.EmitEvent("Disappear", "Coin");
     }
 }
-/* Впровадити систему день/ніч
+/* Впровадити збереження налаштувань, внесених через UI (меню)
  * у власному курсовому проєкті
  */
