@@ -1,33 +1,58 @@
 using UnityEngine;
+using UnityEngine.Device;
 
 public class GameControllerScript : MonoBehaviour
 {
     [SerializeField] private GameObject coinPrefab;
     [SerializeField] private GameObject character;
 
-    private float minCoinCharacterDistance = 10.0f;
-    private float maxCoinCharacterDistance = 30.0f;
+    private float minCoinCharacterDistance;
+    private float maxCoinCharacterDistance;
     private float minCoinMapOffset = 50.0f;
     private float minCoinHeight = 1.0f;
-    private float maxCoinHeight = 2.5f;
+    private float maxCoinHeight = 2.5f; 
+    
+    private readonly string[] listenableEvents = { "Disappear", nameof(GameState) };
+
 
     void Start()
     {
-        GameEventController.AddListener("Disappear", OnDisappearEvent);
+        GameEventController.AddListener(listenableEvents, OnGameEvent);
+        OnGameEvent(nameof(GameState), null);
     }
 
+    private void OnGameEvent(string type, object payload)
+    {
+        switch (type)
+        {
+            case "Disappear": OnDisappearEvent(type, payload); break;
+            case nameof(GameState):
+                minCoinCharacterDistance = GameState.coinSpawnDistance;
+                maxCoinCharacterDistance = GameState.coinSpawnDistance * GameState.coinSpawnZoneRatio;
+                break;
+        }
+    }
     private void OnDisappearEvent(string type, object payload)
     {
         if(payload.Equals("Coin"))
         {
-            int rnd = Random.Range(0, 3);
+            int minCoins = 1 + (int)(GameState.minCoinsOnScene * GameState.coinSpawnProbability);
+            int presentCoins = GameObject.FindGameObjectsWithTag("Coin").Length;
+            if(presentCoins > minCoins * 2)
+            {
+                return;
+            }
+            int rnd = Random.Range(0, minCoins);
             for (int i = 0; i < rnd; i++)
             {
                  SpawnCoin();
             }
-            if(GameObject.FindGameObjectsWithTag("Coin").Length < 2)
+            if(presentCoins + rnd <= minCoins)
             {
-                SpawnCoin();
+                for (int i = 0; i <= minCoins - presentCoins - rnd; i++)
+                {
+                    SpawnCoin();
+                }
             }
         }
         // Debug.Log(type + " " + payload);
@@ -72,6 +97,6 @@ public class GameControllerScript : MonoBehaviour
 
     private void OnDestroy()
     {
-        GameEventController.RemoveListener("Disappear", OnDisappearEvent);
+        GameEventController.RemoveListener(listenableEvents, OnGameEvent);
     }
 }

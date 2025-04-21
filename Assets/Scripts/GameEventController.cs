@@ -26,11 +26,27 @@ public class GameEventController
         listeners[type].Add(action);
     }
 
+    public static void AddListener(IEnumerable<String> types, Action<String, object> action)
+    {
+        foreach (string type in types)
+        {
+            AddListener(type, action);
+        }
+    }
+
     public static void RemoveListener(String type, Action<String, object> action)
     {
         if (listeners.ContainsKey(type))
         {
             listeners[type].Remove(action);
+        }
+    }
+
+    public static void RemoveListener(IEnumerable<String> types, Action<String, object> action)
+    {
+        foreach (string type in types)
+        {
+            RemoveListener(type, action);
         }
     }
 }

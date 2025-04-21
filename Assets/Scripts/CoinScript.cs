@@ -23,6 +23,6 @@ public class CoinScript : MonoBehaviour
         GameEventController.EmitEvent("Disappear", "Coin");
     }
 }
-/* Впровадити збереження налаштувань, внесених через UI (меню)
+/* Впровадити регулювання якості (графіка, тощо)
  * у власному курсовому проєкті
  */

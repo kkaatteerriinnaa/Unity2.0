@@ -12,8 +12,10 @@ public class RadarScript : MonoBehaviour
     private List<CoinPoint> coinPoints = new();
     [SerializeField]
     private float activeZoneRatio = 0.85f;
-    [SerializeField]
-    private float maxVisibleDistance = 35f;
+
+    private float maxVisibleDistance;
+    private readonly string[] listenableEvents = { "SpawnCoin", "CoinDisappear", nameof(GameState) };
+
 
     void Start()
     {
@@ -31,8 +33,8 @@ public class RadarScript : MonoBehaviour
             });
         }
 
-        GameEventController.AddListener("SpawnCoin", OnCoinSpawnEvent);
-        GameEventController.AddListener("CoinDisappear", OnDisappearEvent);
+        GameEventController.AddListener(listenableEvents, OnGameEvent);
+        OnGameEvent(nameof(GameState), null);
     }
 
     void Update()
@@ -93,11 +95,25 @@ public class RadarScript : MonoBehaviour
         }
     }
 
+    private void OnGameEvent(string type, object payload)
+    {
+        switch (type)
+        {
+            case "SpawnCoin": OnCoinSpawnEvent(type,payload); break;
+            case "CoinDisappear": OnDisappearEvent(type, payload); break;
+            case nameof(GameState):
+                screen.gameObject.SetActive(GameState.isRadarVisible);
+                maxVisibleDistance = GameState.radarVisibleRadius;
+                break;
+        }
+    }
+
+
     private void OnDestroy()
     {
-        GameEventController.RemoveListener("SpawnCoin", OnCoinSpawnEvent);
-        GameEventController.RemoveListener("CoinDisappear", OnDisappearEvent);
+        GameEventController.RemoveListener(listenableEvents, OnGameEvent);
     }
+
 
     private class CoinPoint
     {
